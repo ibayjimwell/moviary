@@ -3,6 +3,7 @@ import Search from './components/Search'
 import { Loader } from './components/Loader';
 import MovieCard from './components/MovieCard';
 import { useDebounce } from 'react-use';
+import { updateSearchCount, getTrendingMovies } from './appwrite';
 
 // API Credentials
 const apiKey = import.meta.env.VITE_TMDB_API_KEY;
@@ -18,14 +19,17 @@ const API_OPTIONS = {
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
   const [movieList, setMovieList] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+ 
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   // Debounce the search term to prevent making too many API requests
   // by waiting for the user to stop typing for 500ms
-  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 1000, [searchTerm])
 
   useEffect(() => {
     const fetchMovies = async (query = '') => {
@@ -51,6 +55,10 @@ const App = () => {
 
         setMovieList(data.results || []);
 
+        if (query && data.results.length > 0) {
+          await updateSearchCount(query, data.results[0])
+        }
+
       } catch (error) {
         console.log(`Error fetching movies: ${error}`);
         setErrorMessage('Error discovering movies. Please try again later.');
@@ -60,6 +68,18 @@ const App = () => {
     };
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    const loadTrendingMovies = async () => {
+      try {
+        const movies = await getTrendingMovies();
+        setTrendingMovies(movies)
+      } catch (error) {
+        console.log(`Error fetching trending movies: ${error}`)
+      }
+    }
+    loadTrendingMovies()
+  }, []);
  
   return (
     <>
@@ -74,7 +94,22 @@ const App = () => {
             <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm}></Search>
           </header>
 
-          <section className='all-movies mt-12'>
+          {trendingMovies.length > 0 && (
+            <section className='trending'>
+              <h2>Trending Movies</h2>
+
+              <ul>
+                {trendingMovies.map((movie, index) => (
+                  <li key={movie.$id}>
+                    <p>{index + 1}</p>
+                    <img src={movie.poster_url} alt={movie.searchTerm} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <section className='all-movies'>
             <h2>All Movies</h2>
 
             {
