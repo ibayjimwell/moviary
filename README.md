@@ -9,7 +9,7 @@
 ## 📃Description
 Moviary is a **Web Application** that you can search movies, browse pupular movies and see the trending movies.
 
-## ⚙ How Moviary Works?
+## ⚙How Moviary Works?
 Moviary is a connected to The Movie Database (TMD) API to get the list of the movies. It's a free API you can visit [www.themoviedb.org](https://www.themoviedb.org/).
 
 ### 📲Features
