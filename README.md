@@ -4,7 +4,7 @@
 ![Moviary Image](https://raw.githubusercontent.com/ibayjimwell/moviary/refs/heads/main/public/app-image.png)
 
 ## 🔗Live Demo
-### 👉 [moviary.vercel.app](https://moviary.vercel.app/)
+👉[moviary.vercel.app](https://moviary.vercel.app/)
 
 ## 📃Description
 Moviary is a **Web Application** that you can search movies, browse pupular movies and see the trending movies.
