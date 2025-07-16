@@ -1,7 +1,7 @@
 # 🎉Moviary
 **Your Personal Movie Diary, Anytime, Anywhere**
 
-![Moviary Image](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeJQeJyzgAzTEVqXiGe90RGBFhfp_4RcJJMQ&s)
+![Moviary Image](https://raw.githubusercontent.com/ibayjimwell/moviary/refs/heads/main/public/app-image.png)
 
 ## 🔗Live Demo
 ### 👉 [moviary.vercel.app](https://moviary.vercel.app/)
