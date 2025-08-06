@@ -88,6 +88,9 @@ const App = () => {
 
         <div className='wrapper'>
           <header>
+            <div className='flex justify-center items-center'>
+              <img className='w-1/6 md:w-1/12' src='./logo.svg' alt='Moviary Logo'/>
+            </div>
             <img src="./hero.png" alt="Movies Banner" />
             <h1>Your Personal <span className='text-gradient'>Movie Diary</span> Anytime Anywhere</h1>
 
