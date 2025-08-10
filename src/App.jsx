@@ -4,6 +4,7 @@ import { Loader } from './components/Loader';
 import MovieCard from './components/MovieCard';
 import { useDebounce } from 'react-use';
 import { updateSearchCount, getTrendingMovies } from './appwrite';
+import Modal from "./components/Modal.jsx";
 
 // API Credentials
 const apiKey = import.meta.env.VITE_TMDB_API_KEY;
@@ -30,6 +31,58 @@ const App = () => {
   // Debounce the search term to prevent making too many API requests
   // by waiting for the user to stop typing for 500ms
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 1000, [searchTerm])
+  
+  // States for Modal Component
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [movieCardClickedId, setMovieCardClickedId] = useState();
+  const [isMovieCardClicked, setIsMovieCardClicked] = useState(false);
+  const [movieInfo, setMovieInfo] = useState({});
+  const [isModalLoading, setIsModalLoading] = useState(true);
+
+  // Movie Card Clicked Handler
+  const handleMovieCardClicked = (id, poster_path) => {
+    setIsMovieCardClicked(true);
+    setMovieCardClickedId(id);
+  }
+
+  useEffect(() => {
+    if (Object.keys(movieInfo).length > 0) {
+      setIsModalLoading(false);
+    } else {
+      setIsModalLoading(true);
+    }
+  }, [movieInfo]);
+
+  // Reactive modal
+  useEffect(() => {
+      const fetchMovieInfo = async () => {
+        if (isMovieCardClicked) {
+          setMovieInfo({});
+          setIsModalOpen(true);
+
+          try {
+            const endpoint = `${apiMovieDiscoverUrl}/movie/${movieCardClickedId}`;
+            const response = await fetch(endpoint, API_OPTIONS);
+
+            if (!response.ok) {
+              throw new Error('Failed to fetch movie details.')
+            }
+
+            const data = await response.json();
+            setMovieInfo(data);
+            
+          } catch (error) {
+            console.log(`Error fetching movie details: ${error}`);
+            setErrorMessage('Error loading movie details. Please try again later.');
+            setMovieInfo({})
+          }
+
+        } else {
+          setIsModalOpen(false);
+        }
+      };
+      fetchMovieInfo();
+  }, [isMovieCardClicked]);
 
   useEffect(() => {
     const fetchMovies = async (query = '') => {
@@ -83,6 +136,9 @@ const App = () => {
  
   return (
     <>
+
+      { isModalOpen && <Modal setIsMovieCardClicked={setIsMovieCardClicked} isModalLoading={isModalLoading} setMovieInfo={setMovieInfo} details={movieInfo} ></Modal> }
+
       <main>
         <div className='pattern'></div>
 
@@ -122,7 +178,9 @@ const App = () => {
               (
                 <ul>
                   {movieList.map((movie) => (
-                    <MovieCard key={movie.id} movie={movie}></MovieCard>
+                      <li className='cursor-pointer' onClick={() => handleMovieCardClicked(movie.id)} key={movie.id}>
+                          <MovieCard movie={movie}></MovieCard>
+                      </li>
                   ))}
                 </ul>
               )
