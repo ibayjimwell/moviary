@@ -145,7 +145,7 @@
     @apply fixed inset-0 flex justify-center items-center w-screen h-screen bg-primary/80 z-[100];
 
     & .modal-card {
-      @apply bg-[#0F0D23] max-h-[85vh] overflow-y-auto w-full px-4 py-6 md:px-12 md:py-10 mx-10 md:mx-[370px] shadow-[#AB8BFF4D]/80 shadow-xl rounded-lg;
+      @apply bg-[#0F0D23] max-h-[85vh] overflow-y-auto w-full px-4 py-6 md:px-12 md:py-10 mx-4 md:mx-[370px] shadow-[#AB8BFF4D]/80 shadow-xl rounded-lg;
     }
   }
 
