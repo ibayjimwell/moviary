@@ -1,23 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Search from './components/Search'
 import { Loader } from './components/Loader';
 import MovieCard from './components/MovieCard';
 import { useDebounce } from 'react-use';
 import { updateSearchCount, getTrendingMovies } from './appwrite';
 import Modal from "./components/Modal.jsx";
+import Request from './request.js'; // API static variables
 
-// API Credentials
-const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-const apiMovieDiscoverUrl = import.meta.env.VITE_TMDB_MOVIE_DISCOVER_URL;
-
-const API_OPTIONS = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${apiKey}`
-  }
-}
-
+// Main App Component
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -29,22 +19,23 @@ const App = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
 
   // Debounce the search term to prevent making too many API requests
-  // by waiting for the user to stop typing for 500ms
+  // by waiting for the user to stop typing for 1000ms
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 1000, [searchTerm])
   
-  // States for Modal Component
+  // States for Pop-up Modal Component
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [movieCardClickedId, setMovieCardClickedId] = useState();
   const [isMovieCardClicked, setIsMovieCardClicked] = useState(false);
-  const [movieInfo, setMovieInfo] = useState({});
+  const [movieInfo, setMovieInfo] = useState({}); // The fetches info of the movie
   const [isModalLoading, setIsModalLoading] = useState(true);
 
   // Movie Card Clicked Handler
-  const handleMovieCardClicked = (id, poster_path) => {
+  const handleMovieCardClicked = (id) => {
     setIsMovieCardClicked(true);
     setMovieCardClickedId(id);
   }
 
+  // Trigger to the modal loader
   useEffect(() => {
     if (Object.keys(movieInfo).length > 0) {
       setIsModalLoading(false);
@@ -53,16 +44,17 @@ const App = () => {
     }
   }, [movieInfo]);
 
-  // Reactive modal
+  // Fetching the info of the clicked movie card
   useEffect(() => {
       const fetchMovieInfo = async () => {
+
         if (isMovieCardClicked) {
           setMovieInfo({});
           setIsModalOpen(true);
 
           try {
-            const endpoint = `${apiMovieDiscoverUrl}/movie/${movieCardClickedId}`;
-            const response = await fetch(endpoint, API_OPTIONS);
+            const endpoint = `${Request.apiMovieDiscoverUrl}/movie/${movieCardClickedId}`;
+            const response = await fetch(endpoint, Request.API_OPTIONS_GET);
 
             if (!response.ok) {
               throw new Error('Failed to fetch movie details.')
@@ -84,6 +76,7 @@ const App = () => {
       fetchMovieInfo();
   }, [isMovieCardClicked]);
 
+  // Fetching the list of the movies
   useEffect(() => {
     const fetchMovies = async (query = '') => {
       setIsLoading(true);
@@ -91,9 +84,9 @@ const App = () => {
 
       try {
         const endpoint = query 
-        ? `${apiMovieDiscoverUrl}/search/movie?query=${encodeURIComponent(query)}`
-        : `${apiMovieDiscoverUrl}/discover/movie?sort_by*popularity.desc`;
-        const response = await fetch(endpoint, API_OPTIONS);
+        ? `${Request.apiMovieDiscoverUrl}/search/movie?query=${encodeURIComponent(query)}`
+        : `${Request.apiMovieDiscoverUrl}/discover/movie?sort_by*popularity.desc`;
+        const response = await fetch(endpoint, Request.API_OPTIONS_GET);
 
         if (!response.ok) {
           throw new Error('Failed to fetch movies.')
@@ -122,6 +115,7 @@ const App = () => {
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
+  // Getting the trending movies from the appwrite.js
   useEffect(() => {
     const loadTrendingMovies = async () => {
       try {
@@ -137,7 +131,7 @@ const App = () => {
   return (
     <>
 
-      { isModalOpen && <Modal setIsMovieCardClicked={setIsMovieCardClicked} isModalLoading={isModalLoading} setMovieInfo={setMovieInfo} details={movieInfo} ></Modal> }
+      { isModalOpen && <Modal setIsMovieCardClicked={setIsMovieCardClicked} isModalLoading={isModalLoading} details={movieInfo} ></Modal> }
 
       <main>
         <div className='pattern'></div>
@@ -156,7 +150,6 @@ const App = () => {
           {trendingMovies.length > 0 && (
             <section className='trending'>
               <h2>Trending Movies</h2>
-
               <ul>
                 {trendingMovies.map((movie, index) => (
                   <li key={movie.$id}>

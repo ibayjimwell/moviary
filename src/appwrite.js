@@ -5,6 +5,7 @@ const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
 const appwriteApiEndpoint = import.meta.env.VITE_APPWRITE_ENDPOINT;
 
+// Creating a client to connect in Appwrite
 const client = new Client()
     .setEndpoint(appwriteApiEndpoint)
     .setProject(projectId)
@@ -12,6 +13,7 @@ const client = new Client()
 const Database = new Databases(client);
 
 export const updateSearchCount = async (searchTerm, movie) => {
+
     // 1. Use Appwrite SDK to check if the search term exists in the database
     try {
 
@@ -26,6 +28,7 @@ export const updateSearchCount = async (searchTerm, movie) => {
                 count: doc.count + 1
             });
         }
+        
         // 3. If it doesn't, create a new document with the search term add count as 1
         else {
             await Database.createDocument(databaseId, collectionId, ID.unique(), {

@@ -1,5 +1,5 @@
-import React from 'react'
 
+// Search Component
 const Search = ({searchTerm, setSearchTerm}) => {
   return (
     <>
