@@ -3,7 +3,7 @@ import Search from './components/Search'
 import { Loader } from './components/Loader';
 import MovieCard from './components/MovieCard';
 import { useDebounce } from 'react-use';
-import { updateSearchCount, getTrendingMovies } from './appwrite';
+import { updateSearchCount, getTrendingMovies } from './api';
 import Modal from "./components/Modal.jsx";
 import Request from './request.js'; // API static variables
 
@@ -115,7 +115,7 @@ const App = () => {
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
-  // Getting the trending movies from the appwrite.js
+  // Getting the trending movies
   useEffect(() => {
     const loadTrendingMovies = async () => {
       try {
